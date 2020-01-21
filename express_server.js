@@ -57,16 +57,26 @@ app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
 })
 
+app.get("/u/:shortURL", (req, res) => {
+  let templateVars = { longURL: urlDatabase };
+  // const longURL = ...
+  res.redirect(longURL);
+});
+
+
 //=============== POST ===============
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  const shortGeneratedUrl = generateRandomString()
+  urlDatabase[shortGeneratedUrl] = req.body.longURL
+  res.redirect('urls/'+shortGeneratedUrl)
 });
 //================================
+
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 })
@@ -80,3 +90,4 @@ function generateRandomString() {
   let randomStr = Math.random().toString(36).substring(7);
   return randomStr;
 }
+
