@@ -4,10 +4,10 @@ const PORT = 8080; //default port
 
 app.set("view engine", "ejs");
 
-// get a web page on path url/hello (in html)
-app.get("/hello", (req, res) => {
-  res.send("<html><body> Hello <b>World</b></body></html>\n");
-});
+// // get a web page on path url/hello (in html)
+// app.get("/hello", (req, res) => {
+//   res.send("<html><body> Hello <b>World</b></body></html>\n");
+// });
 
 
 //===========get  ejs ===================
@@ -26,6 +26,9 @@ app.get("/hello", (req, res) => {
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
+// app.get("/urls/:shortURL/delete", (req, res) => {
+//   res.render("/urls/:shortURL/delete");
+// });
 
 app.get("/urls/id", (req, res) => {
   res.render("urls_new");
@@ -58,8 +61,8 @@ app.get("/fetch", (req, res) => {
 })
 
 app.get("/u/:shortURL", (req, res) => {
-  let templateVars = { longURL: urlDatabase };
-  // const longURL = ...
+  const longURL = urlDatabase[req.params.shortURL]
+  console.log(req.params);
   res.redirect(longURL);
 });
 
@@ -74,6 +77,12 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortGeneratedUrl] = req.body.longURL
   res.redirect('urls/'+shortGeneratedUrl)
 });
+
+app.post('/urls/:shortURL/delete', (req, res) => {
+  delete urlDatabase[req.params.shortURL]
+  
+  res.redirect('/urls')
+})
 //================================
 
 
