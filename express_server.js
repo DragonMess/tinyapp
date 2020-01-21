@@ -10,7 +10,7 @@ app.get("/hello", (req, res) => {
 });
 
 
-//=========== ejs ===================
+//===========get  ejs ===================
 
 // add route /urls & pass data with res.render
 app.get("/urls", (req, res) => {
@@ -22,11 +22,25 @@ app.get("/hello", (req, res) => {
   let templateVars = { greeting: 'Hello World'};
   res.render('hello_world', templateVars);
 });
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+app.get("/urls/id", (req, res) => {
+  res.render("urls_new");
+});
+
+// add object with a key[shortURL] and key value LongURL { shortURL: LongURL} inside html
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: "http://www.lighthouselabs.ca" };
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
+
+// app.get("/urls/:id", (req, res) => {
+//   res.render("urls_new");
+// });
 
 //================GET==============
 
@@ -42,8 +56,17 @@ app.get("/set", (req, res) => {
 app.get("/fetch", (req, res) => {
   res.send(`a = ${a}`);
 })
-//================================
 
+//=============== POST ===============
+
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // Log the POST request body to the console
+  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+});
+//================================
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 })
@@ -52,3 +75,8 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+function generateRandomString() {
+  let randomStr = Math.random().toString(36).substring(7);
+  return randomStr;
+}
