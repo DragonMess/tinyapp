@@ -83,6 +83,24 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   
   res.redirect('/urls')
 })
+
+// send to edit page when request to edit
+app.post('/urls/:shortURL/edit', (req, res) => {
+  res.redirect(`/urls/${req.params.shortURL}`)
+})
+
+app.post(`/urls_edit/:shortURL`, (req, res) => {
+  // urlDatabase[req.params.shortURL] = {
+  //   shortURL: req.params.shortURL = req.body.longURL
+  // }
+  urlDatabase[req.params.shortURL] = req.body.edit;
+  console.log(req.params.shortURL)
+  console.log(req.body)
+
+  res.redirect(`/urls`)
+})
+
+
 //================================
 
 
