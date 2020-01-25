@@ -19,13 +19,14 @@
             
  
           <% } else{ %>  
-            <form class="form-inline" action="/urls_logout" method="POST">
-              
-                <label for="username">Logged In As: <%=email%></label>
-                <a class="nav-item nav-link" href="/urls_logout" style="position: relative;left: 0px;" >Logout</a>
+            <label for="username">Logged In As: <%=email%></label>
+              <form method="POST" action="/urls_logout" >
 
-              
-            </form>
+                
+                <!-- <a class="nav-item nav-link"  style="position: relative;left: 0px;">Logout </a> -->
+                
+                <button style="width: 200px; margin: 0.5em; padding: 10px" type="submit" class="btn .btn-link">Logout</button>
+                </form>
          <% } %>
           
         </div>

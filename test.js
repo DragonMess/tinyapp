@@ -138,3 +138,16 @@ app.post(`/urls_register`, (req, res) => {
   }
   res.render(`urls_index`,templateVars);
 });
+
+
+
+<form class="form-inline" action="/urls_logout" method="POST"></form>
+
+
+<a class="nav-item nav-link" href=<%= url %>style="position: relative;left: 0px;">Login</a>
+<td><%= url %></td>
+
+<a href<%=(urls[url].longURL).getString%>>
+
+
+href<%=(urls[url].longURL).getString%> 
