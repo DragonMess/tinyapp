@@ -13,7 +13,7 @@ const urlDatabase = {
     "user2RandomID": {
       "id": "user2RandomID",
       "email": "user2@example.com",
-      "password": "dishwasher-funk"
+      "password": "fun"
     },
     "user3RandomID": {
       "id": "user3RandomID",
@@ -22,6 +22,6 @@ const urlDatabase = {
     }
     
   };
-  
+  // "password": "dishwasher-funk"
   module.exports = {urlDatabase, users};
   
