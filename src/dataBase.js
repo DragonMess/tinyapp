@@ -1,5 +1,5 @@
 const urlDatabase = {
-    b2xVn2: {longURL:"http://www.lighthouselabs.ca", userID: "userRandomID"},
+    "b2xVn2": {longURL:"http://www.lighthouselabs.ca", userID: "userRandomID"},
     "9sm5xK": {longURL:"http://www.google.com", userID: "user2RandomID"},
     "b6UTxQ": { longURL: "https://www.tsn.ca", userID: "user3RandomID" }
   };
