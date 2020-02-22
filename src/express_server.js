@@ -11,7 +11,14 @@ const users = require("./dataBase").users;
 const generateRandomString = require("./functions").generateRandomString;
 const getUserByEmail = require("./helpers").getUserByEmail;
 const getUserByEmailPassword = require("./helpers").getUserByEmailPassword;
-
+const templateVars = {
+  urls: urlDatabase,
+  username: undefined,
+  password: null,
+  email:'' ,
+  id: undefined,
+  message:''
+};
 //=========== Settings ===================
 app.set("view engine", "ejs");
 
@@ -22,57 +29,29 @@ app.use(morgan('dev'));
 //=========== GET ===================
 
 app.get("/urls", (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: req.cookies.id
-  };
+  templateVars.email = req.cookies.email;
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls_register", (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: undefined
-  };
+  templateVars.email = req.cookies.email;
   res.render("urls_register", templateVars);
 });
 
+
 app.get("/urls_login", (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: undefined
-  };
+templateVars.email = req.cookies.email;
   res.render("urls_login", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: req.cookies.id
-  };
+  templateVars.email = req.cookies.email;
+  templateVars.id = req.cookies.id;
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/id", (req, res) => {
-  const templateVars = {
-    urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: undefined
-  };
+  templateVars.email = req.cookies.email;
   res.render("urls_new", templateVars);
 });
 
@@ -85,7 +64,6 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  console.log(req.params);
   res.redirect(longURL);
 });
 
@@ -105,55 +83,32 @@ app.get("/fetch", (req, res) => {
 app.post("/urls", (req, res) => {
   const shortGeneratedUrl = generateRandomString();
   let long = {longURL:req.body.longURL, userID:req.cookies.id};
-  
   urlDatabase[shortGeneratedUrl] = long;
-  console.log(req.body.longURL);
-  const templateVars = {
-    urls: urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: req.cookies.id
-  }
+  templateVars.email = req.cookies.email;
+  templateVars.id = req.cookies.id;
   res.render("urls_index" ,templateVars);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
-  const templateVars = {
-    urls: urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: undefined
-  }
-  res.redirect("/urls",templateVars);
+  templateVars.email = req.cookies.email;
+  res.render(`urls_index`, templateVars);
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  console.log(req.params.shortURL);
-  const templateVars = {
-    urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: undefined,
-    shortURL: req.params.shortURL, 
-    longURL: req.params.longURL
-  };
+  templateVars.email = req.cookies.email;
+  templateVars.shortURL = req.params.shortURL;
+  templateVars.longURL = req.params.longURL;
+
   res.render('urls_show', templateVars);
 });
 
 app.post(`/urls_edit/:shortURL`, (req, res) => {
   let newLongUrl = req.body.edit;
   urlDatabase[req.params.shortURL] = {longURL: newLongUrl, userID:req.cookies.id};
-  const templateVars = {
-    urls: urlDatabase,
-    username: undefined,
-    password: null,
-    email: req.cookies.email,
-    id: req.cookies.id
-  };
+  templateVars.email = req.cookies.email;
+  templateVars.id = req.cookies.id;
+
   res.render(`urls_index`, templateVars);
 });
 
@@ -197,8 +152,6 @@ app.post(`/urls_register`, (req, res) => {
 app.post(`/urls_login`, (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  let user;
-  let id;
   let templateVars;
   let result = getUserByEmailPassword(email, users, password);
   let valid = result.valid;
@@ -209,7 +162,8 @@ app.post(`/urls_login`, (req, res) => {
       id: users[keyUser].id,
       email: email,
       password: password,
-      urls: urlDatabase
+      urls: urlDatabase,
+      message:''
     };
     res.cookie("email", templateVars.email);
     res.cookie("id", templateVars.id);
@@ -226,6 +180,7 @@ app.post(`/urls_login`, (req, res) => {
 
 app.post(`/urls_logout`, (req, res) => {
   res.clearCookie("id");
+  res.clearCookie("email");
   const templateVars = {
     urls: urlDatabase,
     username: undefined,
