@@ -4,13 +4,13 @@ const PORT = 8080; //default port
 const bodyParser = require("body-parser");
 const morgan = require('morgan');
 let cookieParser = require("cookie-parser");
+const bcrypt = require('bcrypt');
 
 //===========MODULES IMPORTS DB - FUNCTIONS  ===================
 const urlDatabase = require("./dataBase").urlDatabase;
 const users = require("./dataBase").users;
 const generateRandomString = require("./functions").generateRandomString;
 const getUserByEmail = require("./helpers").getUserByEmail;
-const getUserByEmailPassword = require("./helpers").getUserByEmailPassword;
 const templateVars = {
   urls: urlDatabase,
   username: undefined,
@@ -23,9 +23,10 @@ const templateVars = {
 app.set("view engine", "ejs");
 
 //=========== Middlewares ===================
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(morgan('dev'));
+
 //=========== GET ===================
 
 app.get("/urls", (req, res) => {
@@ -120,6 +121,7 @@ app.post(`/urls_register`, (req, res) => {
   let result = getUserByEmail(email, users);
   let valid = result.valid;
   let templateVars;
+  const hashedPassword = bcrypt.hashSync(password, 10);
 
   if (!email || (email === "" && !password) || password === "") {
     res
@@ -138,10 +140,10 @@ app.post(`/urls_register`, (req, res) => {
     templateVars = {
       id: shortGeneratedid,
       email: email,
-      password: password,
+      password: hashedPassword,
       urls: urlDatabase
     };
-
+    
     res.cookie("email", templateVars.email);
     res.cookie("id", templateVars.id);
   }
@@ -149,15 +151,18 @@ app.post(`/urls_register`, (req, res) => {
 });
 
 //=========== Login an user and verify identity ============
+
 app.post(`/urls_login`, (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   let templateVars;
-  let result = getUserByEmailPassword(email, users, password);
+  let result = getUserByEmail(email, users);
   let valid = result.valid;
   let keyUser = result.keyUser;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  let validPassword = bcrypt.compareSync(users[keyUser].password, hashedPassword);
 
-  if (valid) {
+  if (valid === true &&  validPassword) {
     templateVars = {
       id: users[keyUser].id,
       email: email,

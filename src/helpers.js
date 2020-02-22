@@ -10,11 +10,12 @@ const getUserByEmail = function(email, dataBase)
       {
         emailUser = dataBase[key].email
         valid = true;
+        keyUser = key;
        break;
        }else {
          valid = false;
        }
-       keyUser = key;
+       
        
      }
       result = {valid , keyUser , emailUser};
@@ -22,26 +23,4 @@ const getUserByEmail = function(email, dataBase)
       return result;
   }
 
-
-const getUserByEmailPassword = function(email,dataBase,password) 
-{
-  let keyUser;
-  for(const key in dataBase) 
-  {
-   if(dataBase[key].email === email && dataBase[key].password === password) 
-    {
-       valid = true;
-       break;
-     }else {
-       valid = false;
-     }
-     keyUser = key;
-     emailUser = dataBase[key].email;
-   }
-    result = {valid , keyUser , emailUser};
-
-    return result;
-}
-
-
-module.exports = {getUserByEmail, getUserByEmailPassword};
+module.exports = {getUserByEmail};
