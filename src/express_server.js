@@ -3,7 +3,7 @@ const app = express();
 const PORT = 8080; //default port
 const bodyParser = require("body-parser");
 const morgan = require('morgan');
-let cookieParser = require("cookie-parser");
+let cookieSession = require('cookie-session')
 const bcrypt = require('bcrypt');
 
 //===========MODULES IMPORTS DB - FUNCTIONS  ===================
@@ -25,34 +25,38 @@ app.set("view engine", "ejs");
 //=========== Middlewares ===================
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['coffee is Good ! for you !'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 //=========== GET ===================
 
 app.get("/urls", (req, res) => {
-  templateVars.email = req.cookies.email;
+  templateVars.email = req.session.user_email;
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls_register", (req, res) => {
-  templateVars.email = req.cookies.email;
+  templateVars.email = req.session.user_email;
   res.render("urls_register", templateVars);
 });
 
 
 app.get("/urls_login", (req, res) => {
-templateVars.email = req.cookies.email;
+  templateVars.email = req.session.user_email;
   res.render("urls_login", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  templateVars.email = req.cookies.email;
-  templateVars.id = req.cookies.id;
+  templateVars.email = req.session.user_email;
+  templateVars.id = req.session.user_id;
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls/id", (req, res) => {
-  templateVars.email = req.cookies.email;
+  templateVars.email = req.session.user_email;
   res.render("urls_new", templateVars);
 });
 
@@ -85,19 +89,19 @@ app.post("/urls", (req, res) => {
   const shortGeneratedUrl = generateRandomString();
   let long = {longURL:req.body.longURL, userID:req.cookies.id};
   urlDatabase[shortGeneratedUrl] = long;
-  templateVars.email = req.cookies.email;
-  templateVars.id = req.cookies.id;
+  templateVars.email = req.session.user_email;
+  templateVars.id = req.session.user_id;
   res.render("urls_index" ,templateVars);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
-  templateVars.email = req.cookies.email;
+  templateVars.email = req.session.user_email;
   res.render(`urls_index`, templateVars);
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  templateVars.email = req.cookies.email;
+  templateVars.email = req.session.user_email;
   templateVars.shortURL = req.params.shortURL;
   templateVars.longURL = req.params.longURL;
 
@@ -107,8 +111,8 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 app.post(`/urls_edit/:shortURL`, (req, res) => {
   let newLongUrl = req.body.edit;
   urlDatabase[req.params.shortURL] = {longURL: newLongUrl, userID:req.cookies.id};
-  templateVars.email = req.cookies.email;
-  templateVars.id = req.cookies.id;
+  templateVars.email = req.session.user_email;
+  templateVars.id = req.session.user_id;
 
   res.render(`urls_index`, templateVars);
 });
@@ -143,9 +147,8 @@ app.post(`/urls_register`, (req, res) => {
       password: hashedPassword,
       urls: urlDatabase
     };
-    
-    res.cookie("email", templateVars.email);
-    res.cookie("id", templateVars.id);
+    req.session.user_id = shortGeneratedid;
+    req.session.user_email = email;
   }
   res.render(`urls_index`, templateVars);
 });
@@ -170,8 +173,8 @@ app.post(`/urls_login`, (req, res) => {
       urls: urlDatabase,
       message:''
     };
-    res.cookie("email", templateVars.email);
-    res.cookie("id", templateVars.id);
+    req.session.user_id = users[keyUser].id;
+    req.session.user_email = email;
     res.render(`urls_index`, templateVars);
   } else {
     res
