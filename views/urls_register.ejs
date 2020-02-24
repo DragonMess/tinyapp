@@ -18,22 +18,21 @@
           <div class="card-header bg-dark text-white text-center">
             <h3>Create Account</h3>
           </div>
-          <div class="card-body">
-  <form action="/urls_register" method="POST">   
-    <label for="email">Email address</label>
-    <input class="form-control" type="email" name="email" placeholder="Enter email" style="width: 200px; margin: 0.5em; padding: 10px"
-    >
-    <label for="password">Password</label>
-    <input class="form-control" type="password" name="password" placeholder="password" style="width: 200px; margin: 0.5em; padding: 10px"
-    >
-    <button style="width: 200px; margin: 0.5em; padding: 10px" type="submit" class="btn btn-primary">Register</button>
-</form>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+          <div class="card-body ">
+           <form action="/urls_register" method="POST">   
+            <label for="email">Email address</label>
+            <input class="form-control " type="email" name="email" placeholder="Enter email" style="max-width: 200px; margin-bottom:10px; ">
+            <label for="password">Password</label>
+            <input class="form-control" type="password" name="password" placeholder="password" style="max-width: 200px;">
+            <button style="max-width: 200px; margin-top:10px;" type="submit" class="btn btn-primary">Register</button>
+           </form>
+          </div>
+        </div>
+      </div>
+    </div>
+   </div>
+     
+<footer>  <%- include('partials/_footer') %> </footer>
   </body>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -41,3 +40,4 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 </body>
 </html>
+

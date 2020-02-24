@@ -11,14 +11,7 @@ const urlDatabase = require("./dataBase").urlDatabase;
 const users = require("./dataBase").users;
 const generateRandomString = require("./functions").generateRandomString;
 const getUserByEmail = require("./helpers").getUserByEmail;
-const templateVars = {
-  urls: urlDatabase,
-  username: undefined,
-  password: null,
-  email:'' ,
-  id: undefined,
-  message:''
-};
+
 //=========== Settings ===================
 app.set("view engine", "ejs");
 
@@ -31,43 +24,108 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
+function authRedirect (req,res,next) {
+  if (req.session.user_email){
+    next();
+  }else {
+    res.redirect('/login');
+  }
+}
+function authNotlogged (req,res,next) {
+  if (req.session.user_email){
+    next();
+  }else {
+    const templateVars = {
+      urls: urlDatabase,
+      username: undefined,
+      password: null,
+      email:undefined ,
+      id: undefined,
+      message:"User is not logged in - Please call login() and then try again"
+    };
+    res.render('urls_error',templateVars);
+  }
+}
+
 //=========== GET ===================
 
-app.get("/urls", (req, res) => {
-  templateVars.email = req.session.user_email;
+app.get("/", authRedirect, (req, res) => {
+  res.redirect('/urls');
+});
+
+app.get("/urls", authNotlogged, (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls_register", (req, res) => {
-  templateVars.email = req.session.user_email;
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:undefined ,
+    id: undefined,
+    message:""
+  };
   res.render("urls_register", templateVars);
 });
 
 
 app.get("/urls_login", (req, res) => {
-  templateVars.email = req.session.user_email;
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:undefined ,
+    id: undefined,
+    message:""
+  };
   res.render("urls_login", templateVars);
 });
 
-app.get("/urls/new", (req, res) => {
-  templateVars.email = req.session.user_email;
-  templateVars.id = req.session.user_id;
+app.get("/urls/new",authNotlogged, (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:undefined ,
+    id: undefined,
+    message:""
+  };
   res.render("urls_new", templateVars);
 });
 
-app.get("/urls/id", (req, res) => {
-  templateVars.email = req.session.user_email;
+app.get("/urls_error", authRedirect, (req, res) => {
+  res.render("urls_error");
+});
+
+app.get("/urls/id",authNotlogged, (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:undefined ,
+    id: undefined,
+    message:""
+  };
   res.render("urls_new", templateVars);
 });
 
-app.get("/urls/:shortURL", (req, res) => {
+app.get("/urls/:shortURL",authNotlogged, (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
   res.render("urls_show", templateVars);
 });
-app.get("/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", authNotlogged, (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
@@ -78,22 +136,42 @@ app.post("/urls", (req, res) => {
   const shortGeneratedUrl = generateRandomString();
   let long = {longURL:req.body.longURL, userID:req.session.user_id};
   urlDatabase[shortGeneratedUrl] = long;
-  templateVars.email = req.session.user_email;
-  templateVars.id = req.session.user_id;
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
   res.render("urls_index" ,templateVars);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
-  templateVars.email = req.session.user_email;
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
   res.render(`urls_index`, templateVars);
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  templateVars.email = req.session.user_email;
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
+  
   templateVars.shortURL = req.params.shortURL;
   templateVars.longURL = req.params.longURL;
-  templateVars.id = req.session.user_id;
 
   res.render('urls_show', templateVars);
 });
@@ -101,8 +179,15 @@ app.post("/urls/:shortURL/edit", (req, res) => {
 app.post(`/urls_edit/:shortURL`, (req, res) => {
   let newLongUrl = req.body.edit;
   urlDatabase[req.params.shortURL] = {longURL: newLongUrl, userID:req.session.user_id};
-  templateVars.email = req.session.user_email;
-  templateVars.id = req.session.user_id;
+
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
 
   res.render(`urls_index`, templateVars);
 });
@@ -114,21 +199,28 @@ app.post(`/urls_register`, (req, res) => {
   const password = req.body.password;
   let result = getUserByEmail(email, users);
   let valid = result.valid;
-  let templateVars;
+  // let templateVars;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
+  let templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
+
   if (!email || (email === "" && !password) || password === "") {
+    templateVars.message='Status Code : 400 - Empty form'
     res
       .status(400)
-      .send(
-        "<html><body> <h1><b>Status Code : 400 - Empty form</b> </h1></body></html>\n"
-      );
+      .render("urls_error", templateVars);
   } else if (valid) {
+    templateVars.message='Status Code : 400 - Email exist'
     res
       .status(400)
-      .send(
-        "<html><body> <h1><b>Status Code : 400 - Email exist</b> </h1></body></html>\n"
-      );
+      .render("urls_error", templateVars);
   } else {
     const shortGeneratedid = generateRandomString();
     templateVars = {
@@ -148,18 +240,24 @@ app.post(`/urls_register`, (req, res) => {
 app.post(`/urls_login`, (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  let templateVars;
   let result = getUserByEmail(email, users);
   let valid = result.valid;
   let keyUser = result.keyUser;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
+  let templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
   if (!email || email === undefined && !password || password === undefined) {
+    templateVars.message='Status Code : 400 - Empty form';
     res
       .status(400)
-      .send(
-        "<html><body> <h1><b>Status Code : 400 - Empty form</b> </h1></body></html>\n"
-      );
+      .render("urls_error", templateVars);
   } 
   else if (valid === true &&  bcrypt.compareSync(users[keyUser].password, hashedPassword)) {
     templateVars = {
@@ -173,26 +271,17 @@ app.post(`/urls_login`, (req, res) => {
     req.session.user_email = email;
     res.render(`urls_index`, templateVars);
   } else {
+    templateVars.message='Status Code : 403 - information does not match our records';
     res
       .status(403)
-      .send(
-        "<html><body> <h1><b>Status Code : 403 - information does not match our records</b> </h1></body></html>\n"
-      );
+      .render("urls_error", templateVars);
   }
 });
 //============  LOGOUT ====================
 
 app.post(`/urls_logout`, (req, res) => {
-  req.session.user_id = undefined;
-  req.session.user_email = undefined;
-  const templateVars = {
-    urls: urlDatabase,
-    username: undefined,
-    password: null,
-    email: undefined,
-    id: undefined
-  };
-  res.render('urls_register',templateVars);
+  req.session = null;
+  res.redirect('/urls_login');
 });
 
 

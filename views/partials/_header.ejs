@@ -6,13 +6,13 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        
+        <a class="navbar-brand" href="/urls">TinyApp</a>
      </div>
           <% if(email === undefined || email === null ) {%>
             <a class="nav-item nav-link" href="/urls_login"style="position: relative;left: 0px;">Login</a>
             <a class="nav-item nav-link" href="/urls_register" style="position: relative;left: 0px;" >Register</a>
           <% } else{ %>  
-            <a class="navbar-brand" href="/urls">TinyApp</a>
+            
             <a class="nav-item nav-link" href="/urls">My URLs</a>
             <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
             <label for="username">Logged In As: <%=email%></label>
