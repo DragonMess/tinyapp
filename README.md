@@ -5,13 +5,20 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Index"](./Docs/index.png)
-!["Create New URL"](./Docs/CreateNewURL.png)
+### Login
 !["Login"](./Docs/login.png)
+### Register
 !["Register"](./Docs/Register.png)
+### User Loged
 !["User Loged"](./Docs/UserLoged.png)
-!["Status 400"](./Docs/Status400Message.png)
-!["Status 403"](./Docs/Status403Message.png)
+### Create New URL
+!["Create New URL"](./Docs/CreateNewURL.png)
+### Edit URL
+!["Edit URL"](./Docs/EditURL.png)
+### Error Message - Email exist
+!["Error Message - Email exist"](./Docs/EmailExistMessage.png)
+### Error Message - Empty Form
+!["Error Message - Empty Form"](./Docs/EmptyFormMessage.png)
 
 
 ## Dependencies

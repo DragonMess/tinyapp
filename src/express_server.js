@@ -28,7 +28,7 @@ function authRedirect (req,res,next) {
   if (req.session.user_email){
     next();
   }else {
-    res.redirect('/login');
+    res.redirect('/urls_login');
   }
 }
 function authNotlogged (req,res,next) {
