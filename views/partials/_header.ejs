@@ -1,27 +1,22 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <a class="navbar-brand" href="/urls">TinyApp</a>
+    
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
+        
      </div>
-          <% if(email === undefined) {%>
+          <% if(email === undefined || email === null ) {%>
             <a class="nav-item nav-link" href="/urls_login"style="position: relative;left: 0px;">Login</a>
             <a class="nav-item nav-link" href="/urls_register" style="position: relative;left: 0px;" >Register</a>
-            
- 
           <% } else{ %>  
+            <a class="navbar-brand" href="/urls">TinyApp</a>
+            <a class="nav-item nav-link" href="/urls">My URLs</a>
             <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-
             <label for="username">Logged In As: <%=email%></label>
               <form method="POST" action="/urls_logout" >
-
-                
-                <!-- <a class="nav-item nav-link"  style="position: relative;left: 0px;">Logout </a> -->
-                
                 <button style="width: 200px; margin: 0.5em; padding: 10px" type="submit" class="btn .btn-link">Logout</button>
                 </form>
          <% } %>
@@ -29,9 +24,5 @@
         </div>
       </div>
     </div>
-
   </nav>
 </header>
-<!--if not log in show login and register
-     if log show email and log out
-     -->

@@ -10,17 +10,13 @@
 </head>
 <body>
   <header>  <%- include('partials/_header') %> </header>
-  
-  
   <main style="margin: 1em;">
     <h3>My URLs</h3>
     <table class="table">
       <thead>
         <tr>
           <th scope="col">Short URL</th>
-          <th scope="col">Long URL</th>
-       
-          
+          <th scope="col">Long URL</th> 
         </tr> 
       </thead>
       <tbody>
@@ -32,10 +28,10 @@
               <button style="width: 200px; margin: 0.5em; padding: 10px" type="submit" class="btn .btn-link"><%= url %></button>
             </form>
                 
-              </a>
+              
             </td>
 
-            <% if( id !== undefined && urls[url].userID === id ) { %>
+            <% if( id !== undefined && urls[url].userID === id && urls[url].userID !== null ) { %>
 
             <td><%= urls[url].longURL %></td>
             

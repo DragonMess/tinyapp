@@ -11,8 +11,14 @@
 <body>
   <header>  <%- include('partials/_header') %> </header>
   <br>
-  <div style="margin: 1em; padding: 10px">
-  <h3>Create Account</h3>
+  <div class="container p-5 ">
+    <div class="row">
+      <div class="col-md-4 offset-md-4">
+        <div class="card">
+          <div class="card-header bg-dark text-white text-center">
+            <h3>Create Account</h3>
+          </div>
+          <div class="card-body">
   <form action="/urls_register" method="POST">   
     <label for="email">Email address</label>
     <input class="form-control" type="email" name="email" placeholder="Enter email" style="width: 200px; margin: 0.5em; padding: 10px"
@@ -21,8 +27,12 @@
     <input class="form-control" type="password" name="password" placeholder="password" style="width: 200px; margin: 0.5em; padding: 10px"
     >
     <button style="width: 200px; margin: 0.5em; padding: 10px" type="submit" class="btn btn-primary">Register</button>
-  
 </form>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
   </body>
   <!-- Bootstrap JS -->

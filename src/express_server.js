@@ -27,7 +27,7 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
-  keys: ['coffee is Good ! for you !'],
+  keys: ['coffee is Good !','for you !'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
@@ -72,22 +72,11 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-//=============Learning GET==============
-app.get("/", (req, res) => {
-  res.send("Hello");
-});
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
-});
 //=============== POST ===============
 
 app.post("/urls", (req, res) => {
   const shortGeneratedUrl = generateRandomString();
-  let long = {longURL:req.body.longURL, userID:req.cookies.id};
+  let long = {longURL:req.body.longURL, userID:req.session.user_id};
   urlDatabase[shortGeneratedUrl] = long;
   templateVars.email = req.session.user_email;
   templateVars.id = req.session.user_id;
@@ -104,13 +93,14 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   templateVars.email = req.session.user_email;
   templateVars.shortURL = req.params.shortURL;
   templateVars.longURL = req.params.longURL;
+  templateVars.id = req.session.user_id;
 
   res.render('urls_show', templateVars);
 });
 
 app.post(`/urls_edit/:shortURL`, (req, res) => {
   let newLongUrl = req.body.edit;
-  urlDatabase[req.params.shortURL] = {longURL: newLongUrl, userID:req.cookies.id};
+  urlDatabase[req.params.shortURL] = {longURL: newLongUrl, userID:req.session.user_id};
   templateVars.email = req.session.user_email;
   templateVars.id = req.session.user_id;
 
@@ -163,9 +153,15 @@ app.post(`/urls_login`, (req, res) => {
   let valid = result.valid;
   let keyUser = result.keyUser;
   const hashedPassword = bcrypt.hashSync(password, 10);
-  let validPassword = bcrypt.compareSync(users[keyUser].password, hashedPassword);
 
-  if (valid === true &&  validPassword) {
+  if (!email || email === undefined && !password || password === undefined) {
+    res
+      .status(400)
+      .send(
+        "<html><body> <h1><b>Status Code : 400 - Empty form</b> </h1></body></html>\n"
+      );
+  } 
+  else if (valid === true &&  bcrypt.compareSync(users[keyUser].password, hashedPassword)) {
     templateVars = {
       id: users[keyUser].id,
       email: email,
@@ -187,8 +183,8 @@ app.post(`/urls_login`, (req, res) => {
 //============  LOGOUT ====================
 
 app.post(`/urls_logout`, (req, res) => {
-  res.clearCookie("id");
-  res.clearCookie("email");
+  req.session.user_id = undefined;
+  req.session.user_email = undefined;
   const templateVars = {
     urls: urlDatabase,
     username: undefined,
@@ -196,8 +192,9 @@ app.post(`/urls_logout`, (req, res) => {
     email: undefined,
     id: undefined
   };
-  res.render("urls_index", templateVars);
+  res.render('urls_register',templateVars);
 });
+
 
 //===========listening  the Server  =====================
 
