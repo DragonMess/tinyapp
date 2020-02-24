@@ -183,8 +183,7 @@ app.post(`/urls_login`, (req, res) => {
 //============  LOGOUT ====================
 
 app.post(`/urls_logout`, (req, res) => {
-  req.session.user_id = undefined;
-  req.session.user_email = undefined;
+  req.session = null;
   const templateVars = {
     urls: urlDatabase,
     username: undefined,
