@@ -6,7 +6,6 @@ const assertEqualValidation = function(actual,expected){
     console.log(`Assertion Failed: ${actual} !== ${expected}`);
   }
 };
-// assertEqual("Lighthouse Labs","Bootcamp");
-//asserEqual(1,1);
+
 
 module.exports = assertEqualValidation;

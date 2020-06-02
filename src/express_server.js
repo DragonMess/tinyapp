@@ -14,6 +14,7 @@ const getUserByEmail = require("./helpers").getUserByEmail;
 
 //=========== Settings ===================
 app.set("view engine", "ejs");
+app.set('views', './views');
 
 //=========== Middlewares ===================
 app.use(morgan('dev'));
@@ -39,8 +40,8 @@ function authNotlogged (req,res,next) {
       urls: urlDatabase,
       username: undefined,
       password: null,
-      email:undefined ,
-      id: undefined,
+      email:req.session.user_email ,
+      id: req.session.user_id,
       message:"User is not logged in - Please call login() and then try again"
     };
     res.render('urls_error',templateVars);
@@ -53,7 +54,7 @@ app.get("/", authRedirect, (req, res) => {
   res.redirect('/urls');
 });
 
-app.get("/urls", authNotlogged, (req, res) => {
+app.get("/urls", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     username: undefined,
@@ -63,6 +64,17 @@ app.get("/urls", authNotlogged, (req, res) => {
     message:""
   };
   res.render("urls_index", templateVars);
+});
+app.get("/MyUrls", authNotlogged, (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: undefined,
+    password: null,
+    email:req.session.user_email ,
+    id: req.session.user_id,
+    message:""
+  };
+  res.render("urls_My_URLS.ejs", templateVars);
 });
 
 app.get("/urls_register", (req, res) => {
@@ -95,8 +107,8 @@ app.get("/urls/new",authNotlogged, (req, res) => {
     urls: urlDatabase,
     username: undefined,
     password: null,
-    email:undefined ,
-    id: undefined,
+    email:req.session.user_email ,
+    id: req.session.user_id,
     message:""
   };
   res.render("urls_new", templateVars);
@@ -111,8 +123,8 @@ app.get("/urls/id",authNotlogged, (req, res) => {
     urls: urlDatabase,
     username: undefined,
     password: null,
-    email:undefined ,
-    id: undefined,
+    email:req.session.user_email ,
+    id: req.session.user_id,
     message:""
   };
   res.render("urls_new", templateVars);
@@ -120,6 +132,9 @@ app.get("/urls/id",authNotlogged, (req, res) => {
 
 app.get("/urls/:shortURL",authNotlogged, (req, res) => {
   const templateVars = {
+    urls: urlDatabase,
+    email:req.session.user_email ,
+    id: req.session.user_id,
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL]
   };
@@ -147,7 +162,7 @@ app.post("/urls", (req, res) => {
   res.render("urls_index" ,templateVars);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete",authNotlogged, (req, res) => {
   delete urlDatabase[req.params.shortURL];
   const templateVars = {
     urls: urlDatabase,
@@ -160,23 +175,22 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.render(`urls_index`, templateVars);
 });
 
-app.post("/urls/:shortURL/edit", (req, res) => {
+app.post("/urls/:shortURL/edit",authNotlogged, (req, res) => {
   const templateVars = {
-    urls: urlDatabase,
+    // urls: urlDatabase,
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL,
     username: undefined,
     password: null,
     email:req.session.user_email ,
     id: req.session.user_id,
     message:""
   };
-  
-  templateVars.shortURL = req.params.shortURL;
-  templateVars.longURL = req.params.longURL;
 
   res.render('urls_show', templateVars);
 });
 
-app.post(`/urls_edit/:shortURL`, (req, res) => {
+app.post(`/urls_edit/:shortURL`,authNotlogged, (req, res) => {
   let newLongUrl = req.body.edit;
   urlDatabase[req.params.shortURL] = {longURL: newLongUrl, userID:req.session.user_id};
 
@@ -199,7 +213,7 @@ app.post(`/urls_register`, (req, res) => {
   const password = req.body.password;
   let result = getUserByEmail(email, users);
   let valid = result.valid;
-  // let templateVars;
+
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   let templateVars = {
@@ -211,7 +225,7 @@ app.post(`/urls_register`, (req, res) => {
     message:""
   };
 
-  if (!email || (email === "" && !password) || password === "") {
+  if (!email || !password) {
     templateVars.message='Status Code : 400 - Empty form'
     res
       .status(400)
