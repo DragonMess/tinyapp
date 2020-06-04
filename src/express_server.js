@@ -15,6 +15,7 @@ const getUserByEmail = require("./helpers").getUserByEmail;
 //=========== Settings ===================
 app.set("view engine", "ejs");
 app.set("views", "./views");
+app.set("trust proxy", 1); // trust first proxy
 
 //=========== Middlewares ===================
 app.use(morgan("dev"));
@@ -56,25 +57,20 @@ app.get("/", authRedirect, (req, res) => {
   res.redirect("/urls");
 });
 
-app.get("/urls", (req, res) => {
+app.get("/urls",authRedirect, (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
-    message: "",
+    users: req.session.users,
   };
   res.render("urls_index", templateVars);
 });
 app.get("/MyUrls", authNotlogged, (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
-    message: "",
   };
   res.render("urls_My_URLS.ejs", templateVars);
 });
@@ -84,8 +80,8 @@ app.get("/urls_register", (req, res) => {
     urls: urlDatabase,
     username: undefined,
     password: null,
-    email: undefined,
-    id: undefined,
+    email: req.session.user_email,
+    id: req.session.user_id,
     message: "",
   };
   res.render("urls_register", templateVars);
@@ -96,8 +92,8 @@ app.get("/urls_login", (req, res) => {
     urls: urlDatabase,
     username: undefined,
     password: null,
-    email: undefined,
-    id: undefined,
+    email: req.session.user_email,
+    id: req.session.user_id,
     message: "",
   };
   res.render("urls_login", templateVars);
@@ -119,16 +115,18 @@ app.get("/urls_error", authRedirect, (req, res) => {
   res.render("urls_error");
 });
 
-app.get("/urls/id", authNotlogged, (req, res) => {
+app.get("/urls/:id", authNotlogged, (req, res) => {
   const templateVars = {
     urls: urlDatabase,
     username: undefined,
     password: null,
     email: req.session.user_email,
     id: req.session.user_id,
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id].longURL,
     message: "",
   };
-  res.render("urls_new", templateVars);
+  res.render("urls_show", templateVars);
 });
 
 app.get("/urls/:shortURL", authNotlogged, (req, res) => {
@@ -142,13 +140,13 @@ app.get("/urls/:shortURL", authNotlogged, (req, res) => {
   res.render("urls_show", templateVars);
 });
 app.get("/u/:shortURL", authNotlogged, (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
 //=============== POST ===============
 
-app.post("/urls", (req, res) => {
+app.post("/urls", authNotlogged, (req, res) => {
   const shortGeneratedUrl = generateRandomString();
   let long = { longURL: req.body.longURL, userID: req.session.user_id };
   urlDatabase[shortGeneratedUrl] = long;
@@ -160,6 +158,7 @@ app.post("/urls", (req, res) => {
     id: req.session.user_id,
     message: "",
   };
+
   res.render("urls_index", templateVars);
 });
 
@@ -187,7 +186,7 @@ app.post("/urls/:shortURL/edit", authNotlogged, (req, res) => {
     id: req.session.user_id,
     message: "",
   };
-
+console.log(templateVars)
   res.render("urls_show", templateVars);
 });
 
@@ -246,14 +245,11 @@ app.post(`/urls_register`, (req, res) => {
     req.session.user_id = shortGeneratedid;
     req.session.user_email = email;
 
-    const qtyUserRandomId = function countProperties(obj) {
-      return Object.keys(obj).length + 1;
-    }
-const userRandomID = `user${qtyUserRandomId(users)}RandomID`
-    console.log(qtyUserRandomId(users))
-    users[userRandomID]= { id:userRandomID,
-    email: email,password: password};
-      console.log(users)
+    users[shortGeneratedid] = {
+      id: shortGeneratedid,
+      email: email,
+      password: password,
+    };
   }
 
   res.render(`urls_index`, templateVars);
@@ -264,6 +260,7 @@ const userRandomID = `user${qtyUserRandomId(users)}RandomID`
 app.post(`/urls_login`, (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+
   let result = getUserByEmail(email, users);
   let valid = result.valid;
   let keyUser = result.keyUser;
@@ -284,15 +281,16 @@ app.post(`/urls_login`, (req, res) => {
     valid === true &&
     bcrypt.compareSync(users[keyUser].password, hashedPassword)
   ) {
+    req.session.user_id = users[keyUser].id;
+    req.session.user_email = email;
     templateVars = {
-      id: users[keyUser].id,
-      email: email,
+      id: req.session.user_id,
+      email: req.session.user_email,
       password: password,
       urls: urlDatabase,
       message: "",
     };
-    req.session.user_id = users[keyUser].id;
-    req.session.user_email = email;
+
     res.render(`urls_index`, templateVars);
   } else {
     templateVars.message =
@@ -304,6 +302,7 @@ app.post(`/urls_login`, (req, res) => {
 
 app.post(`/urls_logout`, (req, res) => {
   req.session = null;
+
   res.redirect("/urls_login");
 });
 

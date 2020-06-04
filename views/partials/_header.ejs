@@ -7,20 +7,20 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="navbar-brand" href="/urls">TinyApp</a>
+        <a class="nav-item nav-link" href="/MyUrls">My URLs</a>
+        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
      
-          <% if(email === undefined || email === null ) {%>
+          <% if(!email) {%>
             <a class="nav-item nav-link" href="/urls_login"style="position: relative;left: 0px;">Login</a>
             <a class="nav-item nav-link" href="/urls_register" style="position: relative;left: 0px;" >Register</a>
-          </div> 
+          
             <% } else{ %>  
-            
-            <a class="nav-item nav-link" href="/MyUrls">My URLs</a>
-            <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-            <a class="nav-item nav-link" >Logged In As: <%=email%></a>
-            <label for="username">Logged In As: <%=email%></label>
-              <form method="POST" action="/urls_logout" >
-                <button style="width: 200px; margin: 0.5em; padding: 10px" type="submit" class="btn .btn-link">Logout</button>
+                <form method="POST" action="/urls_logout" >
+                <label for="username">Logged In As: <%=email%></label>
+
+                <button  type="submit" class="btn .btn-link">Logout</button>
                 </form>
+              </div> 
          <% } %>
           
         </div>
