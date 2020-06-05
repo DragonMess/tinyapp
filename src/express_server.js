@@ -41,8 +41,6 @@ function authNotlogged(req, res, next) {
   } else {
     const templateVars = {
       urls: urlDatabase,
-      username: undefined,
-      password: null,
       email: req.session.user_email,
       id: req.session.user_id,
       message: "User is not logged in - Please call login() and then try again",
@@ -78,8 +76,6 @@ app.get("/MyUrls", authNotlogged, (req, res) => {
 app.get("/urls_register", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -90,8 +86,6 @@ app.get("/urls_register", (req, res) => {
 app.get("/urls_login", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -102,8 +96,6 @@ app.get("/urls_login", (req, res) => {
 app.get("/urls/new", authNotlogged, (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -118,8 +110,6 @@ app.get("/urls_error", authRedirect, (req, res) => {
 app.get("/urls/:id", authNotlogged, (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     shortURL: req.params.id,
@@ -152,8 +142,6 @@ app.post("/urls", authNotlogged, (req, res) => {
   urlDatabase[shortGeneratedUrl] = long;
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -166,8 +154,6 @@ app.post("/urls/:shortURL/delete", authNotlogged, (req, res) => {
   delete urlDatabase[req.params.shortURL];
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -180,8 +166,6 @@ app.post("/urls/:shortURL/edit", authNotlogged, (req, res) => {
     urls: urlDatabase,
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -199,8 +183,6 @@ app.post(`/urls_edit/:shortURL`, authNotlogged, (req, res) => {
 
   const templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -221,8 +203,6 @@ app.post(`/urls_register`, (req, res) => {
 
   let templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
@@ -268,8 +248,6 @@ app.post(`/urls_login`, (req, res) => {
 
   let templateVars = {
     urls: urlDatabase,
-    username: undefined,
-    password: null,
     email: req.session.user_email,
     id: req.session.user_id,
     message: "",
