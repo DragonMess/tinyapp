@@ -25,7 +25,7 @@
             
 
             
-            <% if( id !== undefined && urls[url].userID === id && urls[url].userID !== null ) { %>
+            <!-- <% if( id !== undefined && urls[url].userID === id && urls[url].userID !== null ) { %> -->
               <td> 
                 <!-- <form action=<%=(urls[url].longURL)%>  > 
                 <button style="width: 200px; margin: 0.5em; padding: 10px" type="submit" class="btn .btn-link"><%= url %></button>
@@ -41,10 +41,10 @@
               
            <td> <form method="POST" action="/urls/<%= url %>/delete">
             <input type="submit" value="Delete" class="btn btn-danger" ></form> </td> 
-            <% } %>
+            <!-- <% } %> -->
           </tr>
           
-        <% } %>
+        <!-- <% } %> -->
       </tbody>
     </table>
   </main>

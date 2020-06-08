@@ -19,7 +19,7 @@
         <h5 class="card-title">TinyURL for: <a><%= longURL %></a></h5>
         <p class="card-text">Short URL: <a target="_blank" rel="" href="<%= longURL %>"><%= shortURL %></a></p>
       </div>
-      <% if( id && urls[shortURL].userID === id && urls[shortURL].userID) { %>
+      <!-- <% if( id && urls[shortURL].userID === id && urls[shortURL].userID) { %> -->
     <div class="card-footer"> <h2>Edit</h2>
       <div class="row justify-content-center">
       <form class="form-inline" action ="/urls_edit/<%=shortURL%>" method="POST">
@@ -30,14 +30,14 @@
         </div>
       </form>
     </div>
-    <% }else{ %> 
+    <!-- <% }else{ %>  -->
       <div class="card-footer">
         <div class="row justify-content-center">
           <h2>This Url is only editable by the owner</h2>
           </div>
         </form>
       </div>
-      <% } %> 
+      <!-- <% } %>  -->
   </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

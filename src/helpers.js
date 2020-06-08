@@ -1,26 +1,41 @@
-const users = require('./dataBase').users;
+const { urlDatabase, users } = require("./dataBase");
+const bcrypt = require("bcrypt");
 
-const getUserByEmail = function(email, dataBase)
-{
-    let emailUser;
-    let keyUser;
-    for(const key in dataBase) 
-    {
-     if(dataBase[key].email === email) 
-      {
-        emailUser = dataBase[key].email
-        valid = true;
-        keyUser = key;
-       break;
-       }else {
-         valid = false;
-       }
-       
-       
-     }
-      result = {valid , keyUser , emailUser};
+const urlsForUser = function (userId) {
+  const userUrls = {};
   
-      return result;
-  }
+  for (let url in urlDatabase) {
+    if (urlDatabase[url].userID === userId) {
+      
+      userUrls[url] = urlDatabase[url];
+    }
+  }return userUrls;
 
-module.exports = {getUserByEmail};
+};
+
+const checkPassword = (loginPassword, hashedPassword) => {
+  if (bcrypt.compareSync(loginPassword, hashedPassword)) {
+    return true;
+  }
+  return false;
+};
+
+const getUserByEmail = function (email, dataBase) {
+  let emailUser;
+  let keyUser;
+  for (const key in dataBase) {
+    if (dataBase[key].email === email) {
+      emailUser = dataBase[key].email;
+      valid = true;
+      keyUser = key;
+      break;
+    } else {
+      valid = false;
+    }
+  }
+  result = { valid, keyUser, emailUser };
+
+  return result;
+};
+
+module.exports = { getUserByEmail, urlsForUser , checkPassword};

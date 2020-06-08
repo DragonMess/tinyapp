@@ -10,12 +10,13 @@ const bcrypt = require("bcrypt");
 const urlDatabase = require("./dataBase").urlDatabase;
 const users = require("./dataBase").users;
 const generateRandomString = require("./functions").generateRandomString;
-const getUserByEmail = require("./helpers").getUserByEmail;
+const {getUserByEmail, urlsForUser, checkPassword} = require("./helpers");
 
 //=========== Settings ===================
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.set("trust proxy", 1); // trust first proxy
+
 
 //=========== Middlewares ===================
 app.use(morgan("dev"));
@@ -27,6 +28,7 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
+
 
 function authRedirect(req, res, next) {
   if (req.session.user_email) {
@@ -57,20 +59,12 @@ app.get("/", authRedirect, (req, res) => {
 
 app.get("/urls",authRedirect, (req, res) => {
   const templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(req.session.user_id),
     email: req.session.user_email,
     id: req.session.user_id,
     users: req.session.users,
   };
   res.render("urls_index", templateVars);
-});
-app.get("/MyUrls", authNotlogged, (req, res) => {
-  const templateVars = {
-    urls: urlDatabase,
-    email: req.session.user_email,
-    id: req.session.user_id,
-  };
-  res.render("urls_My_URLS.ejs", templateVars);
 });
 
 app.get("/urls_register", (req, res) => {
@@ -108,6 +102,7 @@ app.get("/urls_error", authRedirect, (req, res) => {
 });
 
 app.get("/urls/:id", authNotlogged, (req, res) => {
+
   const templateVars = {
     urls: urlDatabase,
     email: req.session.user_email,
@@ -140,25 +135,12 @@ app.post("/urls", authNotlogged, (req, res) => {
   const shortGeneratedUrl = generateRandomString();
   let long = { longURL: req.body.longURL, userID: req.session.user_id };
   urlDatabase[shortGeneratedUrl] = long;
-  const templateVars = {
-    urls: urlDatabase,
-    email: req.session.user_email,
-    id: req.session.user_id,
-    message: "",
-  };
-
-  res.render("urls_index", templateVars);
+  res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/delete", authNotlogged, (req, res) => {
   delete urlDatabase[req.params.shortURL];
-  const templateVars = {
-    urls: urlDatabase,
-    email: req.session.user_email,
-    id: req.session.user_id,
-    message: "",
-  };
-  res.render(`urls_index`, templateVars);
+  res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/edit", authNotlogged, (req, res) => {
@@ -170,7 +152,6 @@ app.post("/urls/:shortURL/edit", authNotlogged, (req, res) => {
     id: req.session.user_id,
     message: "",
   };
-console.log(templateVars)
   res.render("urls_show", templateVars);
 });
 
@@ -180,15 +161,7 @@ app.post(`/urls_edit/:shortURL`, authNotlogged, (req, res) => {
     longURL: newLongUrl,
     userID: req.session.user_id,
   };
-
-  const templateVars = {
-    urls: urlDatabase,
-    email: req.session.user_email,
-    id: req.session.user_id,
-    message: "",
-  };
-
-  res.render(`urls_index`, templateVars);
+  res.redirect("/urls");
 });
 
 //====== register a new user ==============
@@ -228,23 +201,22 @@ app.post(`/urls_register`, (req, res) => {
     users[shortGeneratedid] = {
       id: shortGeneratedid,
       email: email,
-      password: password,
+      password: hashedPassword,
     };
+    console.log(users)
   }
-
-  res.render(`urls_index`, templateVars);
+  res.redirect("/urls");
 });
 
 //=========== Login an user and verify identity ============
 
 app.post(`/urls_login`, (req, res) => {
   const email = req.body.email;
-  const password = req.body.password;
+  const loginPassword = req.body.password;
 
   let result = getUserByEmail(email, users);
   let valid = result.valid;
   let keyUser = result.keyUser;
-  const hashedPassword = bcrypt.hashSync(password, 10);
 
   let templateVars = {
     urls: urlDatabase,
@@ -252,24 +224,22 @@ app.post(`/urls_login`, (req, res) => {
     id: req.session.user_id,
     message: "",
   };
-  if (!email || (email === undefined && !password) || password === undefined) {
+  if (!email || (email === undefined && !loginPassword) || loginPassword === undefined) {
     templateVars.message = "Status Code : 400 - Empty form";
     res.status(400).render("urls_error", templateVars);
   } else if (
-    valid === true &&
-    bcrypt.compareSync(users[keyUser].password, hashedPassword)
-  ) {
+    valid === true && checkPassword(loginPassword,users[keyUser].password))
+
+  {
     req.session.user_id = users[keyUser].id;
     req.session.user_email = email;
     templateVars = {
       id: req.session.user_id,
       email: req.session.user_email,
-      password: password,
       urls: urlDatabase,
       message: "",
     };
-
-    res.render(`urls_index`, templateVars);
+    res.redirect("/urls");
   } else {
     templateVars.message =
       "Status Code : 403 - information does not match our records";
