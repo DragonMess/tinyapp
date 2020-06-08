@@ -101,7 +101,7 @@ app.get("/urls_error", authRedirect, (req, res) => {
   res.render("urls_error");
 });
 
-app.get("/urls/:id", authNotlogged, (req, res) => {
+app.get("/urls/:id",authNotlogged, (req, res) => {
 
   const templateVars = {
     urls: urlDatabase,
@@ -124,7 +124,7 @@ app.get("/urls/:shortURL", authNotlogged, (req, res) => {
   };
   res.render("urls_show", templateVars);
 });
-app.get("/u/:shortURL", authNotlogged, (req, res) => {
+app.get("/u/:shortURL",  (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
